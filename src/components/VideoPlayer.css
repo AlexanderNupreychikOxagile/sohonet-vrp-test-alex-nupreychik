@@ -1,0 +1,16 @@
+.vrp-video {
+  width: min(100vw, 960px);
+}
+
+.vrp-video .video-js {
+  width: 100%;
+  background-color: #000;
+}
+
+.vrp-video .vjs-control-bar {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.vrp-video .vjs-big-play-button {
+  border-color: rgba(255, 255, 255, 0.7);
+}
