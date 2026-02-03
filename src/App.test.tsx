@@ -4,7 +4,17 @@ import userEvent from '@testing-library/user-event'
 import App from './App'
 
 vi.mock('video.js', () => ({
-  default: vi.fn(() => ({ dispose: vi.fn(), src: vi.fn() })),
+  default: vi.fn(() => ({
+    dispose: vi.fn(),
+    src: vi.fn(),
+    on: vi.fn(),
+    off: vi.fn(),
+    currentTime: vi.fn(() => 0),
+    duration: vi.fn(() => 0),
+    paused: vi.fn(() => true),
+    pause: vi.fn(),
+    el: vi.fn(() => document.createElement('div')),
+  })),
 }))
 
 import videojs from 'video.js'
