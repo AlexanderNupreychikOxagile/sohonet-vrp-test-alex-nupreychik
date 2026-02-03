@@ -1,5 +1,5 @@
 .vrp-video {
-  width: min(100vw, 960px);
+  width: 100%;
 }
 
 .vrp-video .video-js {

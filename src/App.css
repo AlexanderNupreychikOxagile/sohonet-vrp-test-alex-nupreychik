@@ -1,5 +1,55 @@
 #root {
-  max-width: 1280px;
+  width: min(960px, calc(100vw - 2rem));
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1rem;
+}
+
+.shell {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(28, 28, 30, 0.8);
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.source {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.sourceInput {
+  flex: 1;
+  min-width: 0;
+  height: 38px;
+  padding: 0 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.92);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.sourceInput:focus {
+  outline: 2px solid rgba(59, 130, 246, 0.55);
+  outline-offset: 2px;
+}
+
+.sourceButton {
+  height: 38px;
+  padding: 0 0.8rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(37, 99, 235, 0.95);
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.sourceButton:hover {
+  background: rgba(29, 78, 216, 0.98);
 }
