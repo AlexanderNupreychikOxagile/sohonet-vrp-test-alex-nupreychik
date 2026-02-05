@@ -1,19 +1,24 @@
 #root {
-  width: min(960px, calc(100vw - 2rem));
+  width: min(1200px, calc(100vw - 2rem));
   margin: 0 auto;
   padding: 1rem;
 }
 
 .shell {
+  --accent: #e11d48;
+  --surface: rgba(255, 255, 255, 0.06);
+  --surface-2: rgba(255, 255, 255, 0.04);
+  --border: rgba(255, 255, 255, 0.14);
+  --text: rgba(255, 255, 255, 0.92);
+  --muted: rgba(255, 255, 255, 0.72);
+
   display: grid;
   gap: 0.75rem;
   padding: 1rem;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(28, 28, 30, 0.8);
-  box-shadow:
-    0 10px 22px rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(24, 24, 27, 0.92);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.22);
 }
 
 .source {
@@ -28,14 +33,13 @@
   height: 38px;
   padding: 0 0.75rem;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.92);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
 }
 
 .sourceInput:focus {
-  outline: 2px solid rgba(59, 130, 246, 0.55);
+  outline: 2px solid rgba(225, 29, 72, 0.5);
   outline-offset: 2px;
 }
 
@@ -43,13 +47,269 @@
   height: 38px;
   padding: 0 0.8rem;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(37, 99, 235, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: var(--accent);
   color: #fff;
   cursor: pointer;
   font-size: 0.9rem;
 }
 
 .sourceButton:hover {
-  background: rgba(29, 78, 216, 0.98);
+  background: rgba(225, 29, 72, 0.92);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 1rem;
+  align-items: stretch;
+  justify-items: stretch;
+}
+
+.playerBox {
+  width: 100%;
+  min-width: 0;
+}
+
+.comments {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.panel {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: var(--surface-2);
+  min-height: 0;
+  overflow: hidden;
+  flex: 1;
+}
+
+.commentEmpty {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.commentForm {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.4rem;
+  padding: 0.6rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--surface-2);
+}
+
+.commentAuthor,
+.commentText {
+  height: 34px;
+  padding: 0 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.commentText {
+  height: auto;
+  padding: 0.55rem 0.75rem;
+  line-height: 1.4;
+  resize: vertical;
+  font: inherit;
+}
+
+.commentAdd {
+  height: 34px;
+  padding: 0 0.8rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: var(--accent);
+  color: rgba(255, 255, 255, 0.92);
+  cursor: pointer;
+  justify-self: start;
+  font-size: 0.85rem;
+}
+
+.commentAdd:hover {
+  background: rgba(225, 29, 72, 0.92);
+}
+
+.commentList {
+  margin: 0;
+  padding: 0.6rem;
+  list-style: none;
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.commentList,
+.commentBody {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+.commentList::-webkit-scrollbar,
+.commentBody::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.commentList::-webkit-scrollbar-track,
+.commentBody::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.commentList::-webkit-scrollbar-thumb,
+.commentBody::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.commentList::-webkit-scrollbar-thumb:hover,
+.commentBody::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
+  background-clip: padding-box;
+}
+
+.commentItem {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.35rem;
+  padding: 0.5rem 0.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.commentItemOpen {
+  border-left: 2px solid rgba(225, 29, 72, 0.7);
+  padding-left: 0.75rem;
+}
+
+.commentItemResolved {
+  border-left: 2px solid rgba(34, 197, 94, 0.7);
+  padding-left: 0.75rem;
+}
+
+.commentItemResolved .commentBody {
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.commentItemResolved .commentMeta {
+  color: rgba(255, 255, 255, 0.32);
+}
+
+.commentHeader {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
+  min-width: 0;
+}
+
+.commentItem:last-child {
+  border-bottom: 0;
+}
+
+.commentJump {
+  text-align: left;
+  padding: 0.2rem 0.25rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 8px;
+  width: 100%;
+  min-width: 0;
+}
+
+.commentJump:hover {
+  background: transparent;
+}
+
+.commentMeta {
+  display: flex;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.78);
+  font-variant-numeric: tabular-nums;
+  min-width: 0;
+}
+
+.commentBody {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--text);
+  overflow-wrap: normal;
+  word-break: normal;
+  overflow-x: auto;
+}
+
+.commentBodyJump {
+  text-align: left;
+  padding: 0.15rem 0.25rem 0.35rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.commentBodyJump:hover {
+  background: transparent;
+}
+
+.commentJump,
+.commentBodyJump,
+.commentResolvedToggle {
+  user-select: none;
+}
+
+.commentResolvedToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 0.25rem;
+}
+
+.commentResolvedToggle input {
+  position: absolute;
+  opacity: 0;
+}
+
+.commentResolvedPill {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.commentResolvedToggle input:focus-visible + .commentResolvedPill {
+  outline: 2px solid rgba(225, 29, 72, 0.5);
+  outline-offset: 2px;
+}
+
+.commentResolvedToggle input:checked + .commentResolvedPill {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: rgba(255, 255, 255, 0.86);
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
 }

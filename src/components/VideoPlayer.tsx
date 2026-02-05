@@ -1,14 +1,28 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import videojs from 'video.js'
 import 'video.js/dist/video-js.css'
 import './VideoPlayer.css'
 import { formatTimecode } from '../utils/formatTimecode'
 
+export type VideoPlayerHandle = {
+  getTime: () => number
+  seek: (time: number) => void
+  isPaused: () => boolean
+}
+
 type VideoPlayerProps = {
   src: string
 }
 
-export function VideoPlayer({ src }: VideoPlayerProps) {
+export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
+  ({ src }, ref) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const playerRef = useRef<ReturnType<typeof videojs> | null>(null)
   const playerElRef = useRef<HTMLElement | null>(null)
@@ -98,6 +112,18 @@ export function VideoPlayer({ src }: VideoPlayerProps) {
     playerRef.current?.src({ src, type: 'application/x-mpegURL' })
   }, [src])
 
+  useImperativeHandle(
+    ref,
+    () => ({
+      getTime: () => playerRef.current?.currentTime() || 0,
+      seek: (time) => {
+        playerRef.current?.currentTime(time)
+      },
+      isPaused: () => !!playerRef.current?.paused(),
+    }),
+    [],
+  )
+
   const timeLabel = useMemo(() => {
     return `${formatTimecode(currentTime)} / ${formatTimecode(duration)}`
   }, [currentTime, duration])
@@ -114,7 +140,8 @@ export function VideoPlayer({ src }: VideoPlayerProps) {
 
   return (
     <div className="vrp-video" data-testid="video-player">
-      <div className="vrp-top">
+      <div className="vrp-stage" ref={containerRef} />
+      <div className="vrp-controls">
         <div className="vrp-time" aria-label="Timecode">
           {timeLabel}
         </div>
@@ -137,8 +164,8 @@ export function VideoPlayer({ src }: VideoPlayerProps) {
           </button>
         </div>
       </div>
-      <div ref={containerRef} />
     </div>
   )
-}
+  },
+)
 
