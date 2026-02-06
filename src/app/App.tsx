@@ -1,9 +1,9 @@
 import { useRef, useState } from 'react'
 import './App.css'
-import { VideoPlayer, type VideoPlayerHandle } from './components/VideoPlayer'
-import { addComment, type Comment } from './comments/comment'
-import { CommentsBoard } from './components/CommentsBoard'
-import { CommentForm } from './components/CommentForm'
+import { VideoPlayer, type VideoPlayerHandle } from '../features/player/VideoPlayer'
+import { addComment, type Comment } from '../features/comments/comment'
+import { CommentsBoard } from '../features/comments/CommentsBoard'
+import { CommentForm } from '../features/comments/CommentForm'
 
 const DEFAULT_SRC =
   'https://storage.googleapis.com/sohonet-interview-video-sample-public/1040056094289814902/manifests/master_stage_3.m3u8'

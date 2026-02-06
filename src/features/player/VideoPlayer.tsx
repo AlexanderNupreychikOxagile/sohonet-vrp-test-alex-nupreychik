@@ -9,7 +9,7 @@ import {
 import videojs from 'video.js'
 import 'video.js/dist/video-js.css'
 import './VideoPlayer.css'
-import { formatTimecode } from '../utils/formatTimecode'
+import { formatTimecode } from '../../shared/utils/formatTimecode'
 
 export type VideoPlayerHandle = {
   getTime: () => number

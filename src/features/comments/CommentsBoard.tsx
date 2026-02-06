@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
-import { type Comment } from '../comments/comment'
-import { formatTimecode } from '../utils/formatTimecode'
+import { type Comment } from './comment'
+import { formatTimecode } from '../../shared/utils/formatTimecode'
 
 type CommentsBoardProps = {
   comments: Comment[]
