@@ -3,14 +3,27 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from './App'
 
-type PlayerMock = ReturnType<typeof createPlayerMock>
+type PlayerMock = {
+  dispose: ReturnType<typeof vi.fn>
+  src: ReturnType<typeof vi.fn>
+  on: ReturnType<typeof vi.fn>
+  off: ReturnType<typeof vi.fn>
+  ready: ReturnType<typeof vi.fn>
+  getChild: ReturnType<typeof vi.fn>
+  currentTime: ReturnType<typeof vi.fn>
+  duration: ReturnType<typeof vi.fn>
+  paused: ReturnType<typeof vi.fn>
+  pause: ReturnType<typeof vi.fn>
+  play: ReturnType<typeof vi.fn>
+  el: ReturnType<typeof vi.fn>
+}
 
 function getPlayerMock() {
   const mock = (videojs as unknown as { mock: { results: Array<{ value: PlayerMock }> } }).mock
   return mock.results[mock.results.length - 1]?.value
 }
 
-function createPlayerMock() {
+function createPlayerMock(): PlayerMock {
   let t = 12.324
   const currentTime = vi.fn((next?: number) => {
     if (next !== undefined) t = next
@@ -23,7 +36,7 @@ function createPlayerMock() {
   el.appendChild(controlBarEl)
 
   const children: Array<{ el: () => HTMLElement }> = []
-  const player: Record<string, unknown> = {
+  const player = {
     dispose: vi.fn(),
     src: vi.fn(),
     on: vi.fn(),
@@ -35,7 +48,7 @@ function createPlayerMock() {
     pause: vi.fn(),
     play: vi.fn(() => Promise.resolve()),
     el: vi.fn(() => el),
-  }
+  } satisfies Omit<PlayerMock, 'getChild'>
 
   const controlBarComp = {
     addChild: vi.fn((
@@ -56,11 +69,11 @@ function createPlayerMock() {
     children: () => children,
   }
 
-  ;(player as { getChild: (name: string) => unknown }).getChild = vi.fn((name: string) =>
+  const getChild = vi.fn((name: string) =>
     name === 'controlBar' || name === 'ControlBar' ? controlBarComp : null,
   )
 
-  return player as unknown as PlayerMock
+  return { ...player, getChild } satisfies PlayerMock
 }
 
 vi.mock('video.js', () => {
@@ -77,7 +90,7 @@ vi.mock('video.js', () => {
       this.el_ = this.createEl()
     }
 
-    createEl() {
+    createEl(): HTMLElement {
       return document.createElement('div')
     }
 
@@ -106,7 +119,7 @@ vi.mock('video.js', () => {
   }
 
   class MockButton extends MockComponent {
-    createEl() {
+    createEl(): HTMLElement {
       const b = document.createElement('button')
       b.type = 'button'
       const icon = document.createElement('span')
@@ -119,15 +132,18 @@ vi.mock('video.js', () => {
     }
   }
 
-  const fn = vi.fn(() => createPlayerMock())
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ;(fn as any).getComponent = (name: string) => {
+  type VideojsMockFn = ReturnType<typeof vi.fn> & {
+    getComponent: (name: string) => unknown
+    registerComponent: (name: string, comp: unknown) => void
+  }
+
+  const fn = vi.fn(() => createPlayerMock()) as unknown as VideojsMockFn
+  fn.getComponent = (name: string) => {
     if (name === 'Button') return MockButton
     if (name === 'Component') return MockComponent
     return registry.get(name)
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ;(fn as any).registerComponent = (name: string, comp: unknown) => {
+  fn.registerComponent = (name: string, comp: unknown) => {
     registry.set(name, comp)
   }
 

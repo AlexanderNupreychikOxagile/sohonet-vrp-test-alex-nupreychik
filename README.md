@@ -1,178 +1,103 @@
-# sohonet-vrp-test-alex-nupreychik
+# Video Review Player (test task)
 
-Video Review Player - Test task
+Minimal Video Review Player built with **Vite + React + TypeScript** and **video.js**.
 
-## Tech Stack
+## Features
 
-This is a Vite + React + TypeScript frontend application with:
+- **HLS playback** via `video.js`
+- **Controls**
+  - play/pause, progress bar
+  - custom timecode: `HH:MM:SS.ms / HH:MM:SS.ms`
+  - seek `±5s`
+  - frame step `±1f` (only enabled while paused)
+- **Comments**
+  - add comment in modal (captures current playback time, pauses on open)
+  - click comment to seek
+  - resolved / reopen toggle
+- **Hotkeys**
+  - Space: play/pause
+  - ArrowLeft/ArrowRight: seek `±5s`
+  - C: open “Add comment”
+  - hotkeys are disabled while typing in inputs / when modal is open
 
-- **React 19** - UI framework
-- **TypeScript** - Type safety
-- **Vite** - Fast build tool and dev server
-- **Vitest** - Unit testing framework
-- **React Testing Library** - React component testing
-- **ESLint** - Code linting
-- **Husky** - Git hooks
-- **lint-staged** - Run linters on staged files
+## FPS / frame step
 
-## Getting Started
+Frame step is based on:
+- **Primary**: `requestVideoFrameCallback` (measured frame delta)
+- **Fallback**: `FRAME-RATE` from the `.m3u8` manifest (if present), otherwise `1/30`
+
+## Getting started
 
 ### Prerequisites
-
-- Node.js (v18 or higher recommended)
+- Node.js 18+ (20+ recommended)
 - npm
 
-### Installation
+### Install
 
 ```bash
-npm install
+npm ci
 ```
 
-### Development
-
-Start the development server with hot module replacement:
+### Run dev server
 
 ```bash
 npm run dev
 ```
 
-The app will be available at `http://localhost:5173`
+App runs on `http://localhost:5173`.
 
-### Building
+## Scripts
 
-Build the application for production:
+- `npm run dev`
+- `npm run build`
+- `npm run preview`
+- `npm run lint`
+- `npm test`
+- `npm run test:ui`
+- `npm run test:coverage`
 
-```bash
-npm run build
-```
-
-Preview the production build:
-
-```bash
-npm run preview
-```
-
-### Testing
-
-Run tests:
-
-```bash
-npm test
-```
-
-Run tests with UI:
-
-```bash
-npm run test:ui
-```
-
-Run tests with coverage:
-
-```bash
-npm run test:coverage
-```
-
-### Linting
-
-Run ESLint:
-
-```bash
-npm run lint
-```
-
-## Git Hooks
-
-This project uses Husky to run pre-commit hooks:
-
-- **pre-commit**: Runs linting and tests on staged files using lint-staged
-
-## Project Structure
+## Project structure
 
 ```
-.
-├── src/
-│   ├── assets/         # Static assets
-│   ├── test/           # Test configuration
-│   ├── App.tsx         # Main app component
-│   ├── App.test.tsx    # App component tests
-│   ├── main.tsx        # Application entry point
-│   └── index.css       # Global styles
-├── public/             # Public static files
-├── dist/               # Build output
-└── index.html          # HTML template
+src/
+  app/
+    App.tsx
+    App.module.css
+    hooks/
+      useReviewHotkeys.ts
+  features/
+    player/
+      VideoPlayer.tsx
+      VideoPlayer.module.css
+      videojsControls.ts
+    comments/
+      CommentsBoard.tsx
+      CommentsBoard.module.css
+      AddCommentModal.tsx
+      AddCommentModal.module.css
+      comment.ts
+  shared/
+    utils/
+      formatTimecode.ts
+      parseM3u8FrameRate.ts
+  test/
+    setup.ts
+  main.tsx
+  index.css
 ```
 
-## React + TypeScript + Vite
+## Screenshot
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![App screenshot](./docs/assets/app.png)
 
-Currently, two official plugins are available:
+## Known issues / tech debt
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **No persistence**: comments live in React state only and are lost on refresh.
+- **No error UI for playback / invalid URL**: if `video.js` fails to load a stream, we don’t surface a user-friendly error message.
+- **FPS parsing is best-effort**:
+  - we fetch the URL and parse `FRAME-RATE` via regex from the manifest text
+  - this may fail due to CORS / non-`.m3u8` URLs / missing `FRAME-RATE`
+  - if multiple variants exist, we currently take the **max** `FRAME-RATE`, not the selected rendition’s FPS
+- **Modal accessibility**: no focus trap (Tab can move focus behind the modal).
+- **Comment IDs**: `addComment()` uses `c_${comments.length + 1}`; if we ever add deletion/reordering/import, IDs can collide. A real app would use UUIDs or a monotonic counter.
 
