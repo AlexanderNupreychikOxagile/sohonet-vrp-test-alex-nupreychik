@@ -129,7 +129,7 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
         if (measuredFrameStepRef.current) return
         frameStepRef.current = 1 / fps
       } catch {
-        // ignore
+        return
       }
     }
 

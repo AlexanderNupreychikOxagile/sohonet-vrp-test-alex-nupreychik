@@ -85,12 +85,12 @@ type VjsControlBarLike = {
 }
 
 type VjsPlayerLike = {
-  currentTime: () => number
-  duration?: () => number
+  currentTime: () => number | undefined
+  duration?: () => number | undefined
   paused: () => boolean
   on: (event: string, cb: () => void) => void
   off: (event: string, cb: () => void) => void
-  getChild: (name: string) => VjsControlBarLike | null
+  getChild: (name: string) => VjsControlBarLike | null | undefined
 }
 
 type ButtonLike = { el: () => HTMLElement; dispose?: () => void }
@@ -126,7 +126,6 @@ export function setupVrpReviewControls(
     1,
   ) as ButtonLike
 
-  // After inserting two items at 0/1, play button shifts to index 2
   const stepForward = controlBar.addChild(
     CONTROL_BUTTON_NAME,
     { controlText: 'Step +1f', className: 'vrp-controlIcon vrp-stepForward', onClick: () => stepFrame(1) },

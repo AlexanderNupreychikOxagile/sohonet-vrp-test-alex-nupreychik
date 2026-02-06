@@ -20,20 +20,17 @@ vi.mock('video.js', () => {
   const registry = new Map<string, unknown>()
 
   class MockComponent {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    options_: any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    player_: any
+    options_: Record<string, unknown>
+    player_: unknown
     el_: HTMLElement
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    constructor(player: any, options: any) {
+    constructor(player: unknown, options: unknown) {
       this.player_ = player
-      this.options_ = options || {}
+      this.options_ = (options as Record<string, unknown>) || {}
       this.el_ = this.createEl()
     }
 
-    createEl() {
+    createEl(): HTMLElement {
       return document.createElement('div')
     }
 
@@ -62,29 +59,32 @@ vi.mock('video.js', () => {
   }
 
   class MockButton extends MockComponent {
-    createEl() {
+    createEl(): HTMLElement {
       const b = document.createElement('button')
       b.type = 'button'
       const icon = document.createElement('span')
       icon.className = 'vjs-icon-placeholder'
       b.appendChild(icon)
       b.addEventListener('click', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ;(this as any).handleClick?.()
+        ;(this as unknown as { handleClick?: () => void }).handleClick?.()
       })
       return b
     }
   }
 
   const fn = vi.fn((el: HTMLElement) => makePlayer(el))
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ;(fn as any).getComponent = (name: string) => {
+  type VideojsMockFn = ReturnType<typeof vi.fn> & {
+    getComponent: (name: string) => unknown
+    registerComponent: (name: string, comp: unknown) => void
+  }
+
+  const api = fn as unknown as VideojsMockFn
+  api.getComponent = (name: string) => {
     if (name === 'Button') return MockButton
     if (name === 'Component') return MockComponent
     return registry.get(name)
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ;(fn as any).registerComponent = (name: string, comp: unknown) => {
+  api.registerComponent = (name: string, comp: unknown) => {
     registry.set(name, comp)
   }
   return { default: fn }
@@ -123,14 +123,13 @@ function createPlayerMock({ paused, time = 0, el }: { paused: boolean; time?: nu
 
   const children: Array<{ el: () => HTMLElement }> = []
   const controlBarComp = {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    addChild: vi.fn((Child: any, options: any, index: number) => {
+    addChild: vi.fn((Child: unknown, options: unknown, index: number) => {
       const Comp =
         typeof Child === 'string'
           ? (videojs as unknown as { getComponent: (n: string) => unknown }).getComponent(Child)
           : Child
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const inst = new (Comp as any)(player, options) as any
+      type VjsCtor = new (p: unknown, o: unknown) => { el: () => HTMLElement }
+      const inst = new (Comp as VjsCtor)(player, options)
       children.splice(index, 0, inst)
       const before = controlBar.children.item(index) || null
       controlBar.insertBefore(inst.el(), before)
@@ -170,6 +169,10 @@ describe('VideoPlayer', () => {
   it('steps by one frame when paused', async () => {
     const user = userEvent.setup()
     let player: PlayerMock | null = null
+    const mustPlayer = () => {
+      if (!player) throw new Error('Expected player to be set')
+      return player
+    }
     makePlayer = (el) => {
       player = createPlayerMock({ paused: true, time: 1, el })
       return player
@@ -178,15 +181,19 @@ describe('VideoPlayer', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Step +1f' }))
 
-    const calls = ((player as PlayerMock).currentTime as unknown as { mock: { calls: unknown[][] } }).mock.calls
+    const calls = mustPlayer().currentTime.mock.calls as unknown[][]
     const last = calls[calls.length - 1]?.[0] as number
     expect(last).toBeCloseTo(1 + 1 / 30, 6)
-    expect((player as PlayerMock).pause).toHaveBeenCalled()
+    expect(mustPlayer().pause).toHaveBeenCalled()
   })
 
   it('seeks by 5 seconds', async () => {
     const user = userEvent.setup()
     let player: PlayerMock | null = null
+    const mustPlayer = () => {
+      if (!player) throw new Error('Expected player to be set')
+      return player
+    }
     makePlayer = (el) => {
       player = createPlayerMock({ paused: true, time: 10, el })
       return player
@@ -195,7 +202,7 @@ describe('VideoPlayer', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Seek +5s' }))
 
-    const calls = ((player as PlayerMock).currentTime as unknown as { mock: { calls: unknown[][] } }).mock.calls
+    const calls = mustPlayer().currentTime.mock.calls as unknown[][]
     const last = calls[calls.length - 1]?.[0] as number
     expect(last).toBeCloseTo(15, 6)
   })
