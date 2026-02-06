@@ -1,0 +1,130 @@
+.video {
+  width: 100%;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.stage {
+  width: 100%;
+}
+
+.stage :global(.video-js) {
+  display: block;
+  width: 100%;
+}
+
+.video :global(.video-js) {
+  width: 100%;
+  background-color: #000;
+}
+
+.video :global(.video-js:focus),
+.video :global(.video-js:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
+.video :global(.video-js button:focus),
+.video :global(.video-js button:focus-visible) {
+  outline: none;
+}
+
+.video :global(.vjs-control-bar) {
+  background-color: rgba(0, 0, 0, 0.7);
+  flex-wrap: wrap;
+  height: auto;
+  padding: 0.2rem 0.2rem 0.25rem;
+}
+
+.video :global(.vjs-current-time),
+.video :global(.vjs-duration),
+.video :global(.vjs-time-divider),
+.video :global(.vjs-remaining-time) {
+  display: none;
+}
+
+.video :global(.vjs-control-bar .vjs-progress-control) {
+  order: -1;
+  flex: 1 1 100%;
+  width: 100%;
+  height: 16px;
+  margin: 0;
+}
+
+.video :global(.vjs-control-bar .vjs-progress-control .vjs-progress-holder) {
+  margin: 0 0.6rem;
+}
+
+.video :global(.vjs-control-bar > :not(.vjs-progress-control)) {
+  height: 2.6em;
+}
+
+.video :global(.vjs-control-bar .vrp-timecode) {
+  order: 97;
+}
+
+.video :global(.vjs-control-bar .vjs-picture-in-picture-control) {
+  order: 98;
+}
+
+.video :global(.vjs-control-bar .vjs-fullscreen-control) {
+  order: 99;
+}
+
+.video :global(.vjs-volume-panel.vjs-volume-panel-horizontal) {
+  width: 10em;
+  transition: none;
+}
+
+.video :global(.vjs-volume-panel.vjs-volume-panel-horizontal .vjs-volume-control.vjs-volume-horizontal) {
+  visibility: visible;
+  opacity: 1;
+  position: relative;
+  width: 5em;
+  height: 2.6em;
+  margin: 0;
+  transition: none;
+}
+
+.video :global(.vrp-timecode) {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-variant-numeric: tabular-nums;
+  padding: 0 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  pointer-events: none;
+}
+
+.video :global(.vrp-controlIcon.vjs-disabled) {
+  opacity: 0.55;
+}
+
+.video :global(.vrp-controlIcon) {
+  display: grid;
+  place-items: center;
+}
+
+.video :global(.vrp-stepBack .vjs-icon-placeholder:before),
+.video :global(.vrp-stepForward .vjs-icon-placeholder:before) {
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font-weight: 700;
+}
+
+.video :global(.vrp-stepBack .vjs-icon-placeholder:before) {
+  content: "−";
+}
+
+.video :global(.vrp-stepForward .vjs-icon-placeholder:before) {
+  content: "+";
+}
+
+.video :global(.vjs-big-play-button) {
+  border-color: rgba(255, 255, 255, 0.7);
+}
+

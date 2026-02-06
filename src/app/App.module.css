@@ -1,0 +1,104 @@
+:global(#root) {
+  width: min(1200px, calc(100vw - 2rem));
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.shell {
+  --accent: #e11d48;
+  --surface: rgba(255, 255, 255, 0.06);
+  --surface-2: rgba(255, 255, 255, 0.04);
+  --border: rgba(255, 255, 255, 0.14);
+  --text: rgba(255, 255, 255, 0.92);
+  --muted: rgba(255, 255, 255, 0.72);
+
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(24, 24, 27, 0.92);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.22);
+}
+
+.source {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.sourceInput {
+  flex: 1;
+  min-width: 0;
+  height: 38px;
+  padding: 0 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.sourceInput:focus {
+  outline: 2px solid rgba(225, 29, 72, 0.5);
+  outline-offset: 2px;
+}
+
+.sourceButton {
+  height: 38px;
+  padding: 0 0.8rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.sourceButton:hover {
+  background: rgba(225, 29, 72, 0.92);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 1rem;
+  align-items: stretch;
+  justify-items: stretch;
+}
+
+.playerBox {
+  width: 100%;
+  min-width: 0;
+}
+
+.comments {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.commentOpen {
+  height: 34px;
+  padding: 0 0.8rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: var(--accent);
+  color: rgba(255, 255, 255, 0.92);
+  cursor: pointer;
+  justify-self: start;
+  font-size: 0.85rem;
+}
+
+.commentOpen:hover {
+  background: rgba(225, 29, 72, 0.92);
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+

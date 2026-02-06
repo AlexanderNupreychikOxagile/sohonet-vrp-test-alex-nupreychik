@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from './App'
@@ -17,25 +17,135 @@ function createPlayerMock() {
     return t
   })
 
-  return {
+  const el = document.createElement('div')
+  const controlBarEl = document.createElement('div')
+  controlBarEl.className = 'vjs-control-bar'
+  el.appendChild(controlBarEl)
+
+  const children: Array<{ el: () => HTMLElement }> = []
+  const player: Record<string, unknown> = {
     dispose: vi.fn(),
     src: vi.fn(),
     on: vi.fn(),
     off: vi.fn(),
+    ready: vi.fn((cb: () => void) => cb()),
     currentTime,
     duration: vi.fn(() => 0),
     paused: vi.fn(() => true),
     pause: vi.fn(),
     play: vi.fn(() => Promise.resolve()),
-    el: vi.fn(() => document.createElement('div')),
+    el: vi.fn(() => el),
   }
+
+  const controlBarComp = {
+    addChild: vi.fn((
+      Child: unknown,
+      options: unknown,
+      index: number,
+    ) => {
+      const Comp =
+        typeof Child === 'string'
+          ? (videojs as unknown as { getComponent: (n: string) => unknown }).getComponent(Child)
+          : Child
+      const inst = new (Comp as new (p: unknown, o: unknown) => { el: () => HTMLElement })(player, options)
+      children.splice(index, 0, inst)
+      const before = controlBarEl.children.item(index) || null
+      controlBarEl.insertBefore(inst.el(), before)
+      return inst
+    }),
+    children: () => children,
+  }
+
+  ;(player as { getChild: (name: string) => unknown }).getChild = vi.fn((name: string) =>
+    name === 'controlBar' || name === 'ControlBar' ? controlBarComp : null,
+  )
+
+  return player as unknown as PlayerMock
 }
 
-vi.mock('video.js', () => ({
-  default: vi.fn(() => createPlayerMock()),
-}))
+vi.mock('video.js', () => {
+  const registry = new Map<string, unknown>()
+
+  class MockComponent {
+    options_: Record<string, unknown>
+    player_: unknown
+    el_: HTMLElement
+
+    constructor(player: unknown, options: unknown) {
+      this.player_ = player
+      this.options_ = (options as Record<string, unknown>) || {}
+      this.el_ = this.createEl()
+    }
+
+    createEl() {
+      return document.createElement('div')
+    }
+
+    el() {
+      return this.el_
+    }
+
+    player() {
+      return this.player_
+    }
+
+    addClass(c: string) {
+      this.el_.classList.add(c)
+    }
+
+    controlText(t: string) {
+      this.el_.setAttribute('aria-label', t)
+      this.el_.setAttribute('title', t)
+      const span = document.createElement('span')
+      span.className = 'vjs-control-text'
+      span.textContent = t
+      this.el_.appendChild(span)
+    }
+
+    dispose() {}
+  }
+
+  class MockButton extends MockComponent {
+    createEl() {
+      const b = document.createElement('button')
+      b.type = 'button'
+      const icon = document.createElement('span')
+      icon.className = 'vjs-icon-placeholder'
+      b.appendChild(icon)
+      b.addEventListener('click', () => {
+        ;(this as unknown as { handleClick?: () => void }).handleClick?.()
+      })
+      return b
+    }
+  }
+
+  const fn = vi.fn(() => createPlayerMock())
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ;(fn as any).getComponent = (name: string) => {
+    if (name === 'Button') return MockButton
+    if (name === 'Component') return MockComponent
+    return registry.get(name)
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ;(fn as any).registerComponent = (name: string, comp: unknown) => {
+    registry.set(name, comp)
+  }
+
+  return { default: fn }
+})
 
 import videojs from 'video.js'
+
+beforeEach(() => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async () => ({ ok: false, text: async () => '' })) as unknown as typeof fetch,
+  )
+})
+
+afterEach(() => {
+  vi.unstubAllGlobals()
+})
 
 describe('App', () => {
   it('loads source, adds comment, and seeks on click', async () => {

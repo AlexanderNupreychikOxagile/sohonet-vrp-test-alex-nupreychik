@@ -14,6 +14,22 @@ function isTypingTarget(t: EventTarget | null) {
   return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || t.isContentEditable
 }
 
+function shouldIgnoreHotkey(e: KeyboardEvent, enabled: boolean) {
+  if (!enabled) return true
+  if (e.metaKey || e.ctrlKey || e.altKey) return true
+  return isTypingTarget(e.target)
+}
+
+type Hotkey = 'togglePlayPause' | 'seekBack' | 'seekForward' | 'openAddComment'
+
+function resolveHotkey(e: KeyboardEvent): Hotkey | null {
+  if (e.code === 'Space' || e.key === ' ') return 'togglePlayPause'
+  if (e.code === 'ArrowLeft') return 'seekBack'
+  if (e.code === 'ArrowRight') return 'seekForward'
+  if (e.code === 'KeyC' || e.key.toLowerCase() === 'c') return 'openAddComment'
+  return null
+}
+
 export function useReviewHotkeys({
   enabled = true,
   target,
@@ -29,32 +45,28 @@ export function useReviewHotkeys({
   useEffect(() => {
     if (target === null) return
 
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (!handlersRef.current.enabled) return
-      if (e.metaKey || e.ctrlKey || e.altKey) return
-      if (isTypingTarget(e.target)) return
+    const onKeyDown = (evt: Event) => {
+      const e = evt as KeyboardEvent
+      const h = handlersRef.current
+      if (shouldIgnoreHotkey(e, h.enabled)) return
 
-      if (e.code === 'Space' || e.key === ' ') {
-        e.preventDefault()
-        handlersRef.current.togglePlayPause()
-        return
-      }
+      const hotkey = resolveHotkey(e)
+      if (!hotkey) return
 
-      if (e.code === 'ArrowLeft') {
-        e.preventDefault()
-        handlersRef.current.seekBySeconds(-5)
-        return
-      }
-
-      if (e.code === 'ArrowRight') {
-        e.preventDefault()
-        handlersRef.current.seekBySeconds(5)
-        return
-      }
-
-      if (e.key.toLowerCase() === 'c') {
-        e.preventDefault()
-        handlersRef.current.openAddComment()
+      e.preventDefault()
+      switch (hotkey) {
+        case 'togglePlayPause':
+          h.togglePlayPause()
+          break
+        case 'seekBack':
+          h.seekBySeconds(-5)
+          break
+        case 'seekForward':
+          h.seekBySeconds(5)
+          break
+        case 'openAddComment':
+          h.openAddComment()
+          break
       }
     }
 

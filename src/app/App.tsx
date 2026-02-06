@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import './App.css'
+import styles from './App.module.css'
 import { VideoPlayer, type VideoPlayerHandle } from '../features/player/VideoPlayer'
 import { addComment, type Comment } from '../features/comments/comment'
 import { CommentsBoard } from '../features/comments/CommentsBoard'
@@ -70,36 +70,36 @@ function App() {
   }
 
   return (
-    <div className="shell">
+    <div className={styles.shell}>
       <form
-        className="source"
+        className={styles.source}
         onSubmit={handleSourceSubmit}
       >
         <input
-          className="sourceInput"
+          className={styles.sourceInput}
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="Paste .m3u8 URL"
           aria-label="Video source URL"
         />
-        <button className="sourceButton" type="submit">
+        <button className={styles.sourceButton} type="submit">
           Open
         </button>
       </form>
 
-      <div className="layout">
-        <div className="playerBox">
+      <div className={styles.layout}>
+        <div className={styles.playerBox}>
           <VideoPlayer ref={playerRef} src={src} />
         </div>
 
-        <div className="comments">
+        <div className={styles.comments}>
           <CommentsBoard
             comments={comments}
             onSeek={(time) => playerRef.current?.seek(time)}
             onToggleResolved={handleToggleResolved}
           />
 
-          <button className="commentOpen" type="button" onClick={handleOpenAddComment}>
+          <button className={styles.commentOpen} type="button" onClick={handleOpenAddComment}>
             Add comment
           </button>
         </div>
