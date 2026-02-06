@@ -39,6 +39,7 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
       controls: true,
       preload: 'auto',
       fluid: true,
+      playsinline: true,
     }
 
     const el = document.createElement('video-js')
@@ -68,6 +69,8 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
     })
 
     const techVideo = player.el()?.querySelector('video')
+    techVideo?.setAttribute('playsinline', '')
+    techVideo?.setAttribute('webkit-playsinline', '')
     let videoFrameCallbackId = 0
     let cancelVideoFrameCallback: (() => void) | null = null
 

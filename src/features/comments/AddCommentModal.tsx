@@ -35,13 +35,13 @@ export function AddCommentModal({
   if (!open) return null
 
   return (
-    <div className={styles.modalOverlay} role="presentation" onMouseDown={onClose}>
+    <div className={styles.modalOverlay} role="presentation" onPointerDown={onClose}>
       <div
         className={styles.modal}
         role="dialog"
         aria-modal="true"
         aria-label="Add comment"
-        onMouseDown={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
       >
         <div className={styles.modalHeader}>
           <div className={styles.modalTitle}>Add comment</div>
