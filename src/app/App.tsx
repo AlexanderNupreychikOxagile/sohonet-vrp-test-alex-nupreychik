@@ -11,6 +11,7 @@ const DEFAULT_SRC =
 
 function App() {
   const playerRef = useRef<VideoPlayerHandle | null>(null)
+  const focusReturnRef = useRef<HTMLElement | null>(null)
   const [value, setValue] = useState(DEFAULT_SRC)
   const [src, setSrc] = useState(DEFAULT_SRC)
   const [comments, setComments] = useState<Comment[]>([])
@@ -28,6 +29,9 @@ function App() {
   }
 
   const handleOpenAddComment = () => {
+    const active = document.activeElement
+    focusReturnRef.current = active instanceof HTMLElement ? active : null
+
     const player = playerRef.current
     const time = player?.getTime() || 0
     player?.pause()
@@ -38,6 +42,7 @@ function App() {
   const handleCloseAddComment = () => {
     setAddOpen(false)
     setText('')
+    focusReturnRef.current?.focus()
   }
 
   useReviewHotkeys({

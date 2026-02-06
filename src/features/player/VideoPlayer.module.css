@@ -72,6 +72,8 @@
 }
 
 .video :global(.vjs-volume-panel.vjs-volume-panel-horizontal) {
+  order: 96;
+  margin-left: auto;
   width: 10em;
   transition: none;
 }
