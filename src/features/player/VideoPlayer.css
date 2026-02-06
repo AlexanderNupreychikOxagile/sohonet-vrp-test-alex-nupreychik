@@ -59,6 +59,17 @@
   background-color: #000;
 }
 
+.vrp-video .video-js:focus,
+.vrp-video .video-js:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.vrp-video .video-js button:focus,
+.vrp-video .video-js button:focus-visible {
+  outline: none;
+}
+
 .vrp-video .vjs-control-bar {
   background-color: rgba(0, 0, 0, 0.7);
 }

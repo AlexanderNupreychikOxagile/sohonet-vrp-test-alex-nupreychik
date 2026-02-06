@@ -3,7 +3,8 @@ import './App.css'
 import { VideoPlayer, type VideoPlayerHandle } from '../features/player/VideoPlayer'
 import { addComment, type Comment } from '../features/comments/comment'
 import { CommentsBoard } from '../features/comments/CommentsBoard'
-import { CommentForm } from '../features/comments/CommentForm'
+import { AddCommentModal } from '../features/comments/AddCommentModal'
+import { useReviewHotkeys } from './hooks/useReviewHotkeys'
 
 const DEFAULT_SRC =
   'https://storage.googleapis.com/sohonet-interview-video-sample-public/1040056094289814902/manifests/master_stage_3.m3u8'
@@ -15,6 +16,36 @@ function App() {
   const [comments, setComments] = useState<Comment[]>([])
   const [author, setAuthor] = useState('')
   const [text, setText] = useState('')
+  const [addOpen, setAddOpen] = useState(false)
+  const [addTime, setAddTime] = useState(0)
+
+  const handleTogglePlayPause = () => playerRef.current?.togglePlayPause()
+
+  const handleSeekBySeconds = (deltaSeconds: number) => {
+    const player = playerRef.current
+    if (!player) return
+    player.seek(Math.max(0, player.getTime() + deltaSeconds))
+  }
+
+  const handleOpenAddComment = () => {
+    const player = playerRef.current
+    const time = player?.getTime() || 0
+    player?.pause()
+    setAddTime(time)
+    setAddOpen(true)
+  }
+
+  const handleCloseAddComment = () => {
+    setAddOpen(false)
+    setText('')
+  }
+
+  useReviewHotkeys({
+    enabled: !addOpen,
+    togglePlayPause: handleTogglePlayPause,
+    seekBySeconds: handleSeekBySeconds,
+    openAddComment: handleOpenAddComment,
+  })
 
   const handleSourceSubmit: NonNullable<React.ComponentProps<'form'>['onSubmit']> = (e) => {
     e.preventDefault()
@@ -33,9 +64,9 @@ function App() {
     const t = text.trim()
     if (!t) return
 
-    const time = playerRef.current?.getTime() || 0
-    setComments((prev) => addComment(prev, { time, author, text: t }))
+    setComments((prev) => addComment(prev, { time: addTime, author, text: t }))
     setText('')
+    setAddOpen(false)
   }
 
   return (
@@ -52,7 +83,7 @@ function App() {
           aria-label="Video source URL"
         />
         <button className="sourceButton" type="submit">
-          Load
+          Open
         </button>
       </form>
 
@@ -68,15 +99,22 @@ function App() {
             onToggleResolved={handleToggleResolved}
           />
 
-          <CommentForm
-            author={author}
-            text={text}
-            onAuthorChange={setAuthor}
-            onTextChange={setText}
-            onSubmit={handleAddComment}
-          />
+          <button className="commentOpen" type="button" onClick={handleOpenAddComment}>
+            Add comment
+          </button>
         </div>
       </div>
+
+      <AddCommentModal
+        open={addOpen}
+        time={addTime}
+        author={author}
+        text={text}
+        onAuthorChange={setAuthor}
+        onTextChange={setText}
+        onClose={handleCloseAddComment}
+        onSubmit={handleAddComment}
+      />
     </div>
   )
 }

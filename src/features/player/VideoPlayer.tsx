@@ -15,6 +15,8 @@ export type VideoPlayerHandle = {
   getTime: () => number
   seek: (time: number) => void
   isPaused: () => boolean
+  pause: () => void
+  togglePlayPause: () => void
 }
 
 type VideoPlayerProps = {
@@ -120,6 +122,15 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
         playerRef.current?.currentTime(time)
       },
       isPaused: () => !!playerRef.current?.paused(),
+      pause: () => {
+        playerRef.current?.pause()
+      },
+      togglePlayPause: () => {
+        const player = playerRef.current
+        if (!player) return
+        if (player.paused()) void player.play()
+        else player.pause()
+      },
     }),
     [],
   )

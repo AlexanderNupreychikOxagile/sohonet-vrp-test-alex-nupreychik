@@ -141,6 +141,81 @@
   background: rgba(225, 29, 72, 0.92);
 }
 
+.commentOpen {
+  height: 34px;
+  padding: 0 0.8rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: var(--accent);
+  color: rgba(255, 255, 255, 0.92);
+  cursor: pointer;
+  justify-self: start;
+  font-size: 0.85rem;
+}
+
+.commentOpen:hover {
+  background: rgba(225, 29, 72, 0.92);
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: grid;
+  place-items: center;
+  z-index: 10;
+  padding: 1rem;
+}
+
+.modal {
+  width: min(520px, calc(100vw - 2rem));
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(24, 24, 27, 0.98);
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.4);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 0.9rem 0;
+}
+
+.modalTitle {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.modalMeta {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-variant-numeric: tabular-nums;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.modalButton {
+  height: 34px;
+  padding: 0 0.8rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.modalButton:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
 .commentList {
   margin: 0;
   padding: 0.6rem;
