@@ -20,12 +20,6 @@ Minimal Video Review Player built with **Vite + React + TypeScript** and **video
   - C: open “Add comment”
   - hotkeys are disabled while typing in inputs / when modal is open
 
-## FPS / frame step
-
-Frame step is based on:
-- **Primary**: `requestVideoFrameCallback` (measured frame delta)
-- **Fallback**: `FRAME-RATE` from the `.m3u8` manifest (if present), otherwise `1/30`
-
 ## Getting started
 
 ### Prerequisites
@@ -59,29 +53,31 @@ App runs on `http://localhost:5173`.
 ## Project structure
 
 ```
+docs/
+  assets/
+    app.png
+
 src/
   app/
-    App.tsx
-    App.module.css
+    App.tsx               # App shell / composition
     hooks/
-      useReviewHotkeys.ts
+      useReviewHotkeys.ts # Global hotkeys (guarded)
   features/
     player/
-      VideoPlayer.tsx
-      VideoPlayer.module.css
-      videojsControls.ts
+      VideoPlayer.tsx     # video.js wrapper
+      videojsControls.ts  # custom control bar components
     comments/
-      CommentsBoard.tsx
-      CommentsBoard.module.css
-      AddCommentModal.tsx
-      AddCommentModal.module.css
-      comment.ts
+      CommentsBoard.tsx    # Comments list (seek + resolve/reopen)
+      AddCommentModal.tsx  # Add comment form (modal)
+      comment.ts           # Comment model + helpers
   shared/
     utils/
       formatTimecode.ts
+      isHttpUrl.ts
       parseM3u8FrameRate.ts
   test/
-    setup.ts
+    setup.ts              # RTL / jest-dom setup
+    videojsMock.ts        # shared video.js mocks
   main.tsx
   index.css
 ```
