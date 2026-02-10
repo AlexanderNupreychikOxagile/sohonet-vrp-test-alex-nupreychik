@@ -125,6 +125,7 @@
   display: block;
   margin-top: 0.25rem;
   color: var(--text);
+  max-width: 100%;
   overflow-wrap: normal;
   word-break: normal;
   overflow-x: auto;
@@ -138,6 +139,8 @@
   color: inherit;
   cursor: pointer;
   border-radius: 8px;
+  width: 100%;
+  min-width: 0;
 }
 
 .commentBodyJump:hover {
