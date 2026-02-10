@@ -16,84 +16,19 @@ type PlayerMock = {
   el: ReturnType<typeof vi.fn>
 }
 
-vi.mock('video.js', () => {
-  const registry = new Map<string, unknown>()
-
-  class MockComponent {
-    options_: Record<string, unknown>
-    player_: unknown
-    el_: HTMLElement
-
-    constructor(player: unknown, options: unknown) {
-      this.player_ = player
-      this.options_ = (options as Record<string, unknown>) || {}
-      this.el_ = this.createEl()
-    }
-
-    createEl(): HTMLElement {
-      return document.createElement('div')
-    }
-
-    el() {
-      return this.el_
-    }
-
-    player() {
-      return this.player_
-    }
-
-    addClass(c: string) {
-      this.el_.classList.add(c)
-    }
-
-    controlText(t: string) {
-      this.el_.setAttribute('aria-label', t)
-      this.el_.setAttribute('title', t)
-      const span = document.createElement('span')
-      span.className = 'vjs-control-text'
-      span.textContent = t
-      this.el_.appendChild(span)
-    }
-
-    dispose() {}
-  }
-
-  class MockButton extends MockComponent {
-    createEl(): HTMLElement {
-      const b = document.createElement('button')
-      b.type = 'button'
-      const icon = document.createElement('span')
-      icon.className = 'vjs-icon-placeholder'
-      b.appendChild(icon)
-      b.addEventListener('click', () => {
-        ;(this as unknown as { handleClick?: () => void }).handleClick?.()
-      })
-      return b
-    }
-  }
-
-  const fn = vi.fn((el: HTMLElement) => makePlayer(el))
-  type VideojsMockFn = ReturnType<typeof vi.fn> & {
-    getComponent: (name: string) => unknown
-    registerComponent: (name: string, comp: unknown) => void
-  }
-
-  const api = fn as unknown as VideojsMockFn
-  api.getComponent = (name: string) => {
-    if (name === 'Button') return MockButton
-    if (name === 'Component') return MockComponent
-    return registry.get(name)
-  }
-  api.registerComponent = (name: string, comp: unknown) => {
-    registry.set(name, comp)
-  }
-  return { default: fn }
-})
-
 import videojs from 'video.js'
 import { VideoPlayer } from './VideoPlayer'
 
-let makePlayer: (el: HTMLElement) => PlayerMock
+let makePlayerImpl: (el: HTMLElement) => PlayerMock
+
+function makePlayer(el: HTMLElement) {
+  return makePlayerImpl(el)
+}
+
+vi.mock('video.js', async () => {
+  const { createVideojsMock } = await import('../../test/videojsMock')
+  return createVideojsMock((el: unknown) => makePlayer(el as HTMLElement))
+})
 
 beforeEach(() => {
   vi.stubGlobal(
@@ -159,7 +94,7 @@ function createPlayerMock({ paused, time = 0, el }: { paused: boolean; time?: nu
 
 describe('VideoPlayer', () => {
   it('disables frame step buttons while playing', async () => {
-    makePlayer = (el) => createPlayerMock({ paused: false, el })
+    makePlayerImpl = (el) => createPlayerMock({ paused: false, el })
     render(<VideoPlayer src="https://example.com/a.m3u8" />)
 
     expect(await screen.findByRole('button', { name: 'Step -1f' })).toBeDisabled()
@@ -173,7 +108,7 @@ describe('VideoPlayer', () => {
       if (!player) throw new Error('Expected player to be set')
       return player
     }
-    makePlayer = (el) => {
+    makePlayerImpl = (el) => {
       player = createPlayerMock({ paused: true, time: 1, el })
       return player
     }
@@ -194,7 +129,7 @@ describe('VideoPlayer', () => {
       if (!player) throw new Error('Expected player to be set')
       return player
     }
-    makePlayer = (el) => {
+    makePlayerImpl = (el) => {
       player = createPlayerMock({ paused: true, time: 10, el })
       return player
     }
@@ -208,7 +143,7 @@ describe('VideoPlayer', () => {
   })
 
   it('renders timecode in control bar', async () => {
-    makePlayer = (el) => createPlayerMock({ paused: true, el })
+    makePlayerImpl = (el) => createPlayerMock({ paused: true, el })
     render(<VideoPlayer src="https://example.com/a.m3u8" />)
     expect(await screen.findByText('00:00:00.000 / 00:00:00.000')).toBeInTheDocument()
   })

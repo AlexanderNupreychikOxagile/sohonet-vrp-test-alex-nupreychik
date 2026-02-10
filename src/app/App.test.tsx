@@ -76,78 +76,9 @@ function createPlayerMock(): PlayerMock {
   return { ...player, getChild } satisfies PlayerMock
 }
 
-vi.mock('video.js', () => {
-  const registry = new Map<string, unknown>()
-
-  class MockComponent {
-    options_: Record<string, unknown>
-    player_: unknown
-    el_: HTMLElement
-
-    constructor(player: unknown, options: unknown) {
-      this.player_ = player
-      this.options_ = (options as Record<string, unknown>) || {}
-      this.el_ = this.createEl()
-    }
-
-    createEl(): HTMLElement {
-      return document.createElement('div')
-    }
-
-    el() {
-      return this.el_
-    }
-
-    player() {
-      return this.player_
-    }
-
-    addClass(c: string) {
-      this.el_.classList.add(c)
-    }
-
-    controlText(t: string) {
-      this.el_.setAttribute('aria-label', t)
-      this.el_.setAttribute('title', t)
-      const span = document.createElement('span')
-      span.className = 'vjs-control-text'
-      span.textContent = t
-      this.el_.appendChild(span)
-    }
-
-    dispose() {}
-  }
-
-  class MockButton extends MockComponent {
-    createEl(): HTMLElement {
-      const b = document.createElement('button')
-      b.type = 'button'
-      const icon = document.createElement('span')
-      icon.className = 'vjs-icon-placeholder'
-      b.appendChild(icon)
-      b.addEventListener('click', () => {
-        ;(this as unknown as { handleClick?: () => void }).handleClick?.()
-      })
-      return b
-    }
-  }
-
-  type VideojsMockFn = ReturnType<typeof vi.fn> & {
-    getComponent: (name: string) => unknown
-    registerComponent: (name: string, comp: unknown) => void
-  }
-
-  const fn = vi.fn(() => createPlayerMock()) as unknown as VideojsMockFn
-  fn.getComponent = (name: string) => {
-    if (name === 'Button') return MockButton
-    if (name === 'Component') return MockComponent
-    return registry.get(name)
-  }
-  fn.registerComponent = (name: string, comp: unknown) => {
-    registry.set(name, comp)
-  }
-
-  return { default: fn }
+vi.mock('video.js', async () => {
+  const { createVideojsMock } = await import('../test/videojsMock')
+  return createVideojsMock(() => createPlayerMock())
 })
 
 import videojs from 'video.js'
@@ -224,8 +155,8 @@ describe('App', () => {
     fireEvent.keyDown(document, { code: 'KeyC', key: 'c' })
     expect(screen.getByRole('dialog', { name: /add comment/i })).toBeInTheDocument()
 
-    ;(player.currentTime as unknown as { mock: { calls: unknown[][] } }).mock.calls.length = 0
+    player.currentTime.mockClear()
     fireEvent.keyDown(document, { code: 'ArrowRight', key: 'ArrowRight' })
-    expect((player.currentTime as unknown as { mock: { calls: unknown[][] } }).mock.calls.length).toBe(0)
+    expect(player.currentTime).not.toHaveBeenCalled()
   })
 })

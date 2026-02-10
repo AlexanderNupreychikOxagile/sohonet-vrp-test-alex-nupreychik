@@ -9,6 +9,7 @@ import 'video.js/dist/video-js.css'
 import styles from './VideoPlayer.module.css'
 import { setupVrpReviewControls } from './videojsControls'
 import { parseM3u8FrameRate } from '../../shared/utils/parseM3u8FrameRate'
+import { isHttpUrl } from '../../shared/utils/isHttpUrl'
 
 export type VideoPlayerHandle = {
   getTime: () => number
@@ -118,6 +119,7 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
     frameStepRef.current = 1 / 30
 
     if (typeof fetch !== 'function') return
+    if (!isHttpUrl(src)) return
     const ac = new AbortController()
 
     const run = async () => {

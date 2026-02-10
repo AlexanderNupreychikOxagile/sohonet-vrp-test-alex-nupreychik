@@ -5,6 +5,7 @@ import { addComment, type Comment } from '../features/comments/comment'
 import { CommentsBoard } from '../features/comments/CommentsBoard'
 import { AddCommentModal } from '../features/comments/AddCommentModal'
 import { useReviewHotkeys } from './hooks/useReviewHotkeys'
+import { isHttpUrl } from '../shared/utils/isHttpUrl'
 
 const DEFAULT_SRC =
   'https://storage.googleapis.com/sohonet-interview-video-sample-public/1040056094289814902/manifests/master_stage_3.m3u8'
@@ -14,6 +15,7 @@ function App() {
   const focusReturnRef = useRef<HTMLElement | null>(null)
   const [value, setValue] = useState(DEFAULT_SRC)
   const [src, setSrc] = useState(DEFAULT_SRC)
+  const [sourceError, setSourceError] = useState('')
   const [comments, setComments] = useState<Comment[]>([])
   const [author, setAuthor] = useState('')
   const [text, setText] = useState('')
@@ -45,6 +47,11 @@ function App() {
     focusReturnRef.current?.focus()
   }
 
+  const handleSourceChange: NonNullable<React.ComponentProps<'input'>['onChange']> = (e) => {
+    setValue(e.target.value)
+    if (sourceError) setSourceError('')
+  }
+
   useReviewHotkeys({
     enabled: !addOpen,
     togglePlayPause: handleTogglePlayPause,
@@ -56,6 +63,11 @@ function App() {
     e.preventDefault()
     const next = value.trim()
     if (!next) return
+    if (!isHttpUrl(next)) {
+      setSourceError('URL must start with http:// or https://')
+      return
+    }
+    setSourceError('')
     setSrc(next)
   }
 
@@ -66,10 +78,11 @@ function App() {
   }
 
   const handleAddComment = () => {
+    const a = author.trim()
     const t = text.trim()
-    if (!t) return
+    if (!a || !t) return
 
-    setComments((prev) => addComment(prev, { time: addTime, author, text: t }))
+    setComments((prev) => addComment(prev, { time: addTime, author: a, text: t }))
     setText('')
     setAddOpen(false)
   }
@@ -83,14 +96,21 @@ function App() {
         <input
           className={styles.sourceInput}
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={handleSourceChange}
           placeholder="Paste .m3u8 URL"
           aria-label="Video source URL"
+          aria-invalid={!!sourceError}
         />
         <button className={styles.sourceButton} type="submit">
           Open
         </button>
       </form>
+
+      {sourceError ? (
+        <div role="alert" className={styles.sourceError}>
+          {sourceError}
+        </div>
+      ) : null}
 
       <div className={styles.layout}>
         <div className={styles.playerBox}>
